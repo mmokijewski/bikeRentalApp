@@ -1,6 +1,7 @@
 package com.mmokijewski.bikeRentalApp.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.mmokijewski.bikeRentalApp.dto.CyclistDto;
 import com.mmokijewski.bikeRentalApp.entity.Cyclist;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CyclistServiceImpl implements CyclistService {
 
-    private static final Logger LOGGER = LogManager.getLogger(CyclistServiceImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(CyclistService.class);
 
     private final CyclistRepository cyclistRepository;
 
@@ -32,12 +33,13 @@ public class CyclistServiceImpl implements CyclistService {
     @Override
     public List<CyclistDto> getAllCyclists() {
         final List<Cyclist> cyclists = this.cyclistRepository.findAll();
-        LOGGER.info("Found: {} bike(s)", cyclists.size());
+        LOGGER.info("Found: {} cyclist(s)", cyclists.size());
         return this.cyclistMapper.mapToDtos(cyclists);
     }
 
     @Override
     public CyclistDto findById(final Long id) {
-        return this.cyclistMapper.mapToDto(this.cyclistRepository.findById(id).get());
+        final Optional<Cyclist> cyclist = this.cyclistRepository.findById(id);
+        return cyclist.map(this.cyclistMapper::mapToDto).orElse(null);
     }
 }

@@ -1,6 +1,7 @@
 package com.mmokijewski.bikeRentalApp.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.mmokijewski.bikeRentalApp.dto.BikeDto;
 import com.mmokijewski.bikeRentalApp.entity.Bike;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BikeServiceImpl implements BikeService {
 
-    private static final Logger LOGGER = LogManager.getLogger(BikeServiceImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(BikeService.class);
 
     private final BikeRepository bikeRepository;
 
@@ -38,6 +39,7 @@ public class BikeServiceImpl implements BikeService {
 
     @Override
     public BikeDto findById(final Long id) {
-        return this.bikeMapper.mapToDto(this.bikeRepository.findById(id).get());
+        final Optional<Bike> bike = this.bikeRepository.findById(id);
+        return bike.map(this.bikeMapper::mapToDto).orElse(null);
     }
 }
