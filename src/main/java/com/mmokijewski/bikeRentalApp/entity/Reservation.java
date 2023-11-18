@@ -18,16 +18,16 @@ public class Reservation extends AbstractEntity {
     @JoinColumn(name = "BIKE_ID", nullable = false, updatable = false)
     private Bike bike;
     @NotNull
-    private LocalDateTime startTime;
+    private LocalDateTime startDate;
     @NotNull
-    private LocalDateTime endTime;
+    private LocalDateTime endDate;
 
-    public Reservation(final Cyclist cyclist, final Bike bike, final LocalDateTime startTime,
-            final LocalDateTime endTime) {
-        this.cyclist = cyclist;
+    public Reservation(final Bike bike, final Cyclist cyclist, final LocalDateTime startDate,
+            final LocalDateTime endDate) {
         this.bike = bike;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.cyclist = cyclist;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public Reservation() {
@@ -49,19 +49,19 @@ public class Reservation extends AbstractEntity {
         this.bike = bike;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
-    public void setStartTime(final LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setStartDate(final LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEndTime(final LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setEndDate(final LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 }

@@ -27,7 +27,7 @@ public class CyclistController {
         return ResponseEntity.ok(this.cyclistService.getAllCyclists());
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CyclistDto> singleCyclist(@PathVariable final Long id) {
         final CyclistDto cyclistDto = cyclistService.findById(id);
         return cyclistDto != null ? ResponseEntity.ok(cyclistDto) : ResponseEntity.notFound().build();
