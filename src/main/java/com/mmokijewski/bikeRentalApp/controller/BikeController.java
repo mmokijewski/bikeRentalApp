@@ -28,8 +28,8 @@ public class BikeController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<BikeDto> singleBike(@PathVariable final String id) {
-        final BikeDto bikeDto = bikeService.findById(Long.parseLong(id));
+    public ResponseEntity<BikeDto> singleBike(@PathVariable final Long id) {
+        final BikeDto bikeDto = bikeService.findById(id);
         return bikeDto != null ? ResponseEntity.ok(bikeDto) : ResponseEntity.notFound().build();
     }
 }

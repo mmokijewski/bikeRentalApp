@@ -28,8 +28,8 @@ public class ReservationController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ReservationDto> singleReservation(@PathVariable final String id) {
-        final ReservationDto reservationDto = reservationService.findById(Long.parseLong(id));
+    public ResponseEntity<ReservationDto> singleReservation(@PathVariable final Long id) {
+        final ReservationDto reservationDto = reservationService.findById(id);
         return reservationDto != null ? ResponseEntity.ok(reservationDto) : ResponseEntity.notFound().build();
     }
 }
