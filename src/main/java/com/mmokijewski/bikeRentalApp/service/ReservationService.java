@@ -2,10 +2,7 @@ package com.mmokijewski.bikeRentalApp.service;
 
 import java.util.List;
 
-import com.mmokijewski.bikeRentalApp.dto.BikeDto;
-import com.mmokijewski.bikeRentalApp.dto.CyclistDto;
 import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
-import com.mmokijewski.bikeRentalApp.entity.Reservation;
 import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
 
 public interface ReservationService {
@@ -14,8 +11,8 @@ public interface ReservationService {
 
     ReservationDto findById(final Long id);
 
-    Reservation createReservation(final BikeDto bike, final CyclistDto cyclist) throws BikeNotAvailableException;
+    ReservationDto createReservation(final Long bikeId, final Long cyclistId) throws BikeNotAvailableException;
 
-    Reservation createReservation(final BikeDto bike, final CyclistDto cyclist, final int minutes)
+    ReservationDto createReservation(final Long bikeId, final Long cyclistId, final int minutes)
             throws BikeNotAvailableException;
 }

@@ -27,7 +27,7 @@ public class BikeController {
         return ResponseEntity.ok(this.bikeService.getAllBikes());
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<BikeDto> singleBike(@PathVariable final Long id) {
         final BikeDto bikeDto = bikeService.findById(id);
         return bikeDto != null ? ResponseEntity.ok(bikeDto) : ResponseEntity.notFound().build();
