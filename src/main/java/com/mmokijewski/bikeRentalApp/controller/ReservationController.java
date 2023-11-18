@@ -3,7 +3,6 @@ package com.mmokijewski.bikeRentalApp.controller;
 import java.util.List;
 
 import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
-import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
 import com.mmokijewski.bikeRentalApp.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,17 +40,18 @@ public class ReservationController {
         try {
             final ReservationDto reservation = reservationService.createReservation(bikeId, cyclistId);
             return ResponseEntity.ok(reservation);
-        } catch (final BikeNotAvailableException e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
         }
     }
 
     @GetMapping("/new/{bikeId}/{cyclistId}/{minutes}")
-    public ResponseEntity newReservation(@PathVariable final Long bikeId, @PathVariable final Long cyclistId, @PathVariable final int minutes) {
+    public ResponseEntity newReservation(@PathVariable final Long bikeId, @PathVariable final Long cyclistId,
+            @PathVariable final int minutes) {
         try {
             final ReservationDto reservation = reservationService.createReservation(bikeId, cyclistId, minutes);
             return ResponseEntity.ok(reservation);
-        } catch (final BikeNotAvailableException e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
         }
     }
