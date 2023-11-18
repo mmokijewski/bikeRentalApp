@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
 import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchBikeException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchCyclistException;
 
 public interface ReservationService {
 
@@ -11,8 +13,9 @@ public interface ReservationService {
 
     ReservationDto findById(final Long id);
 
-    ReservationDto createReservation(final Long bikeId, final Long cyclistId) throws BikeNotAvailableException;
+    ReservationDto createReservation(final Long bikeId, final Long cyclistId)
+            throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException;
 
     ReservationDto createReservation(final Long bikeId, final Long cyclistId, final int minutes)
-            throws BikeNotAvailableException;
+            throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException;
 }

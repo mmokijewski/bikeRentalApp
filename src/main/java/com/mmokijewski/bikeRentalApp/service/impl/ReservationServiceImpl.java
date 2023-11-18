@@ -10,6 +10,8 @@ import com.mmokijewski.bikeRentalApp.entity.Bike;
 import com.mmokijewski.bikeRentalApp.entity.Cyclist;
 import com.mmokijewski.bikeRentalApp.entity.Reservation;
 import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchBikeException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchCyclistException;
 import com.mmokijewski.bikeRentalApp.mapper.ReservationMapper;
 import com.mmokijewski.bikeRentalApp.repository.BikeRepository;
 import com.mmokijewski.bikeRentalApp.repository.CyclistRepository;
@@ -53,31 +55,29 @@ public class ReservationServiceImpl implements ReservationService {
         return reservation.map(this.reservationMapper::mapToDto).orElse(null);
     }
 
-    public ReservationDto createReservation(final Long bikeId, final Long cyclistId) throws BikeNotAvailableException {
-        final Bike bike = bikeRepository.findById(bikeId).get();
-        if (checkIfBikeAvailable(bike)) {
-            final Cyclist cyclist = cyclistRepository.findById(cyclistId).get();
-            final Reservation newReservation = new Reservation(bike, cyclist, LocalDateTime.now(),
-                    LocalDateTime.now().plus(DEFAULT_RESERVATION_TIME_IN_MINUTES, ChronoUnit.MINUTES));
-            reservationRepository.saveAndFlush(newReservation);
-            return reservationMapper.mapToDto(newReservation);
-        } else {
-            throw new BikeNotAvailableException(bike.getId().toString());
-        }
+    public ReservationDto createReservation(final Long bikeId, final Long cyclistId)
+            throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
+        return createNewReservation(bikeId, cyclistId, DEFAULT_RESERVATION_TIME_IN_MINUTES);
     }
 
     public ReservationDto createReservation(final Long bikeId, final Long cyclistId, final int minutes)
-            throws BikeNotAvailableException {
+            throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
+        return createNewReservation(bikeId, cyclistId, minutes);
+    }
 
-        final Bike bike = bikeRepository.findById(bikeId).get();
+    private ReservationDto createNewReservation(final Long bikeId, final Long cyclistId, final int minutes)
+            throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
+        final Bike bike = bikeRepository.findById(bikeId).orElseThrow(() -> new NoSuchBikeException(bikeId));
+        final Cyclist cyclist =
+                cyclistRepository.findById(cyclistId).orElseThrow(() -> new NoSuchCyclistException(cyclistId));
         if (checkIfBikeAvailable(bike)) {
-            final Cyclist cyclist = cyclistRepository.findById(cyclistId).get();
+
             final Reservation newReservation = new Reservation(bike, cyclist, LocalDateTime.now(),
                     LocalDateTime.now().plus(minutes, ChronoUnit.MINUTES));
             reservationRepository.saveAndFlush(newReservation);
             return reservationMapper.mapToDto(newReservation);
         } else {
-            throw new BikeNotAvailableException(bike.getId().toString());
+            throw new BikeNotAvailableException(bike.getId());
         }
     }
 
