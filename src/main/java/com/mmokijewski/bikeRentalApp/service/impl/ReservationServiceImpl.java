@@ -71,10 +71,9 @@ public class ReservationServiceImpl implements ReservationService {
         final Cyclist cyclist =
                 cyclistRepository.findById(cyclistId).orElseThrow(() -> new NoSuchCyclistException(cyclistId));
         if (checkIfBikeAvailable(bike)) {
-
-            final Reservation newReservation = new Reservation(bike, cyclist, LocalDateTime.now(),
-                    LocalDateTime.now().plus(minutes, ChronoUnit.MINUTES));
-            reservationRepository.saveAndFlush(newReservation);
+            final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            final Reservation newReservation = new Reservation(bike, cyclist, now,
+                    now.plus(minutes, ChronoUnit.MINUTES));
             return reservationMapper.mapToDto(newReservation);
         } else {
             throw new BikeNotAvailableException(bike.getId());
