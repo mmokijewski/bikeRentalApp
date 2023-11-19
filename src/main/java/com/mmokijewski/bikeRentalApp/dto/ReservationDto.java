@@ -9,6 +9,7 @@ public class ReservationDto {
     private CyclistDto cyclist;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private boolean cancelled;
 
     public Long getId() {
         return id;
@@ -48,5 +49,13 @@ public class ReservationDto {
 
     public void setEndDate(final LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(final boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

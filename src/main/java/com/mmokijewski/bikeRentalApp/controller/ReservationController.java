@@ -55,4 +55,14 @@ public class ReservationController {
             return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
         }
     }
+
+    @GetMapping("/cancel/{id}")
+    public ResponseEntity cancelReservation(@PathVariable final Long id) {
+        try {
+            final ReservationDto reservation = reservationService.cancelReservation(id);
+            return ResponseEntity.ok(reservation);
+        } catch (final Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
+        }
+    }
 }

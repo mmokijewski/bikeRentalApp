@@ -35,6 +35,8 @@ public class Reservation extends AbstractEntity {
     private LocalDateTime startDate;
     @NotNull
     private LocalDateTime endDate;
+    @NotNull
+    private boolean cancelled;
 
     public Reservation(final Bike bike, final Cyclist cyclist, final LocalDateTime startDate,
             final LocalDateTime endDate) {
@@ -42,6 +44,7 @@ public class Reservation extends AbstractEntity {
         this.cyclist = cyclist;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.cancelled = false;
     }
 
     public Reservation() {
@@ -77,5 +80,13 @@ public class Reservation extends AbstractEntity {
 
     public void setEndDate(final LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(final boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

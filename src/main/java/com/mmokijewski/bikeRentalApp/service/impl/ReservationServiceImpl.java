@@ -5,8 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.NoResultException;
-
 import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
 import com.mmokijewski.bikeRentalApp.entity.Bike;
 import com.mmokijewski.bikeRentalApp.entity.Cyclist;
@@ -14,6 +12,7 @@ import com.mmokijewski.bikeRentalApp.entity.Reservation;
 import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
 import com.mmokijewski.bikeRentalApp.exception.NoSuchBikeException;
 import com.mmokijewski.bikeRentalApp.exception.NoSuchCyclistException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchReservationException;
 import com.mmokijewski.bikeRentalApp.mapper.ReservationMapper;
 import com.mmokijewski.bikeRentalApp.repository.BikeRepository;
 import com.mmokijewski.bikeRentalApp.repository.CyclistRepository;
@@ -47,25 +46,39 @@ public class ReservationServiceImpl implements ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Override
     public List<ReservationDto> getAllReservations() {
         final List<Reservation> reservations = reservationRepository.findAll();
         LOGGER.info("Found: {} reservation(s)", reservations.size());
         return reservationMapper.mapToDtos(reservations);
     }
 
+    @Override
     public ReservationDto findById(final Long id) {
         final Optional<Reservation> reservation = this.reservationRepository.findById(id);
         return reservation.map(this.reservationMapper::mapToDto).orElse(null);
     }
 
+    @Override
     public ReservationDto createReservation(final Long bikeId, final Long cyclistId)
             throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
         return createNewReservation(bikeId, cyclistId, DEFAULT_RESERVATION_TIME_IN_MINUTES);
     }
 
+    @Override
     public ReservationDto createReservation(final Long bikeId, final Long cyclistId, final int minutes)
             throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
         return createNewReservation(bikeId, cyclistId, minutes);
+    }
+
+    @Override
+    public ReservationDto cancelReservation(final Long id) throws NoSuchReservationException {
+        final Reservation reservation =
+                reservationRepository.findById(id).orElseThrow(() -> new NoSuchReservationException(id));
+        reservation.setCancelled(true);
+        reservation.setUpdateDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        final Reservation saveResult = reservationRepository.saveAndFlush(reservation);
+        return reservationMapper.mapToDto(saveResult);
     }
 
     private ReservationDto createNewReservation(final Long bikeId, final Long cyclistId, final int minutes)
