@@ -2,6 +2,8 @@ package com.mmokijewski.bikeRentalApp.dto;
 
 import java.time.LocalDateTime;
 
+import com.mmokijewski.bikeRentalApp.enums.ReservationStatus;
+
 public class ReservationDto {
 
     private Long id;
@@ -9,7 +11,7 @@ public class ReservationDto {
     private CyclistDto cyclist;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private boolean cancelled;
+    private ReservationStatus status;
 
     public Long getId() {
         return id;
@@ -51,11 +53,11 @@ public class ReservationDto {
         this.endDate = endDate;
     }
 
-    public boolean isCancelled() {
-        return cancelled;
+    public ReservationStatus getStatus() {
+        return status;
     }
 
-    public void setCancelled(final boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setStatus(final ReservationStatus status) {
+        this.status = status;
     }
 }

@@ -3,11 +3,14 @@ package com.mmokijewski.bikeRentalApp.entity;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
+import com.mmokijewski.bikeRentalApp.enums.ReservationStatus;
 import com.sun.istack.NotNull;
 
 @NamedQueries({
@@ -36,15 +39,17 @@ public class Reservation extends AbstractEntity {
     @NotNull
     private LocalDateTime endDate;
     @NotNull
-    private boolean cancelled;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
     public Reservation(final Bike bike, final Cyclist cyclist, final LocalDateTime startDate,
             final LocalDateTime endDate) {
         this.bike = bike;
         this.cyclist = cyclist;
+        this.setCreateDate(startDate);
         this.startDate = startDate;
         this.endDate = endDate;
-        this.cancelled = false;
+        this.status = ReservationStatus.ACTIVE;
     }
 
     public Reservation() {
@@ -82,11 +87,11 @@ public class Reservation extends AbstractEntity {
         this.endDate = endDate;
     }
 
-    public boolean isCancelled() {
-        return cancelled;
+    public ReservationStatus getStatus() {
+        return status;
     }
 
-    public void setCancelled(final boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setStatus(final ReservationStatus status) {
+        this.status = status;
     }
 }
