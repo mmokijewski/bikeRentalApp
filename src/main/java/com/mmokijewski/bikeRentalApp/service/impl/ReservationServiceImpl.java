@@ -5,6 +5,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.NoResultException;
+
 import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
 import com.mmokijewski.bikeRentalApp.entity.Bike;
 import com.mmokijewski.bikeRentalApp.entity.Cyclist;
@@ -20,6 +22,7 @@ import com.mmokijewski.bikeRentalApp.service.ReservationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,8 +85,13 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private boolean checkIfBikeAvailable(final Bike bike) {
-        final Reservation lastReservation = reservationRepository.findLastReservationByBikeId(bike.getId());
-        LOGGER.info(lastReservation.getId());
+        final Reservation lastReservation;
+        try {
+            lastReservation = reservationRepository.findLastReservationByBikeId(bike.getId());
+        } catch (final EmptyResultDataAccessException e) {
+            LOGGER.info("There are no reservations for bike with id '{}' yet", bike.getId());
+            return true;
+        }
         return lastReservation.getEndDate().isBefore(LocalDateTime.now());
     }
 }
