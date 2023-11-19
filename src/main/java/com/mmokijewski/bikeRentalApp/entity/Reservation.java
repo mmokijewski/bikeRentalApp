@@ -5,11 +5,25 @@ import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import com.sun.istack.NotNull;
 
+@NamedQueries({
+        @NamedQuery(name = Reservation.FIND_LAST_RESERVATION_BY_BIKE_ID,
+            query = "SELECT r FROM Reservation r JOIN r.bike b WHERE b.id = :bikeId AND r.endDate = " +
+                    "(SELECT MAX(res.endDate) FROM Reservation res JOIN res.bike bi WHERE bi.id = :bikeId)"),
+
+        @NamedQuery(name = Reservation.FIND_LAST_RESERVATION,
+            query = "SELECT r FROM Reservation r WHERE r.endDate = (SELECT MAX(res.endDate) FROM Reservation res)")
+})
+
 @Entity
 public class Reservation extends AbstractEntity {
+
+    public static final String FIND_LAST_RESERVATION = "Reservation.findLastReservation";
+    public static final String FIND_LAST_RESERVATION_BY_BIKE_ID = "Reservation.findLastReservationByBikeId";
 
     @ManyToOne
     @JoinColumn(name = "CYCLIST_ID", nullable = false)
