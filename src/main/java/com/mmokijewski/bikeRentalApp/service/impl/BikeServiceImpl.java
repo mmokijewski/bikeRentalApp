@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import com.mmokijewski.bikeRentalApp.dto.BikeDto;
 import com.mmokijewski.bikeRentalApp.entity.Bike;
+import com.mmokijewski.bikeRentalApp.enums.BikeStatus;
+import com.mmokijewski.bikeRentalApp.exception.BikeCurrentlyReservedException;
+import com.mmokijewski.bikeRentalApp.exception.NoSuchBikeException;
 import com.mmokijewski.bikeRentalApp.mapper.BikeMapper;
 import com.mmokijewski.bikeRentalApp.repository.BikeRepository;
 import com.mmokijewski.bikeRentalApp.service.BikeService;
@@ -41,5 +44,23 @@ public class BikeServiceImpl implements BikeService {
     public BikeDto findById(final Long id) {
         final Optional<Bike> bike = this.bikeRepository.findById(id);
         return bike.map(this.bikeMapper::mapToDto).orElse(null);
+    }
+
+    @Override
+    public BikeDto changeStatus(final Long id, final BikeStatus status) throws NoSuchBikeException {
+        final Bike bike = bikeRepository.findById(id).orElseThrow(() -> new NoSuchBikeException(id));
+        bike.setStatus(status);
+        final Bike savedBike = bikeRepository.saveAndFlush(bike);
+        return bikeMapper.mapToDto(savedBike);
+    }
+
+    @Override
+    public BikeDto sendToService(final Long id) throws NoSuchBikeException, BikeCurrentlyReservedException {
+        final Bike bike = bikeRepository.findById(id).orElseThrow(() -> new NoSuchBikeException(id));
+        if (bike.getStatus().equals(BikeStatus.RESERVED)) {
+            throw new BikeCurrentlyReservedException(id);
+        } else {
+            return changeStatus(id, BikeStatus.IN_SERVICE);
+        }
     }
 }

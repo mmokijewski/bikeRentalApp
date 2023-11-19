@@ -12,6 +12,7 @@ import com.mmokijewski.bikeRentalApp.dto.ReservationDto;
 import com.mmokijewski.bikeRentalApp.entity.Bike;
 import com.mmokijewski.bikeRentalApp.entity.Cyclist;
 import com.mmokijewski.bikeRentalApp.entity.Reservation;
+import com.mmokijewski.bikeRentalApp.enums.BikeStatus;
 import com.mmokijewski.bikeRentalApp.enums.ReservationStatus;
 import com.mmokijewski.bikeRentalApp.exception.BikeNotAvailableException;
 import com.mmokijewski.bikeRentalApp.exception.NoSuchBikeException;
@@ -25,8 +26,6 @@ import com.mmokijewski.bikeRentalApp.service.ReservationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,39 +92,33 @@ public class ReservationServiceImpl implements ReservationService {
         final Bike bike = bikeRepository.findById(bikeId).orElseThrow(() -> new NoSuchBikeException(bikeId));
         final Cyclist cyclist =
                 cyclistRepository.findById(cyclistId).orElseThrow(() -> new NoSuchCyclistException(cyclistId));
-        if (checkIfBikeAvailable(bike)) {
+        if (bike.getStatus().equals(BikeStatus.FREE)) {
             final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             final LocalDateTime end = now.plus(minutes, ChronoUnit.MINUTES);
             final Reservation newReservation = new Reservation(bike, cyclist, now, end);
             final Reservation saveResult = reservationRepository.saveAndFlush(newReservation);
+            bike.setStatus(BikeStatus.RESERVED);
+            bikeRepository.saveAndFlush(bike);
             return reservationMapper.mapToDto(saveResult);
         } else {
             throw new BikeNotAvailableException(bike.getId());
         }
     }
 
-    private boolean checkIfBikeAvailable(final Bike bike) {
-        final Reservation lastReservation;
-        try {
-            lastReservation = reservationRepository.findLastReservationByBikeId(bike.getId());
-        } catch (final EmptyResultDataAccessException e) {
-            LOGGER.info("There are no reservations for bike with id '{}' yet", bike.getId());
-            return true;
-        }
-        return lastReservation.getEndDate().isBefore(LocalDateTime.now());
-    }
-
-    private void finishReservationInFuture(final Long id, final int minutes) {
+    private void finishReservationInFuture(final Long reservationId, final int minutes) {
         final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         final Runnable task = () -> {
-            final Optional<Reservation> reservationOptional = reservationRepository.findById(id);
+            final Optional<Reservation> reservationOptional = reservationRepository.findById(reservationId);
             if (reservationOptional.isPresent()) {
                 final Reservation reservation = reservationOptional.get();
                 reservation.setStatus(ReservationStatus.FINISHED);
                 reservation.setUpdateDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
                 reservationRepository.saveAndFlush(reservation);
+                final Bike bike = bikeRepository.findById(reservation.getBike().getId()).get();
+                bike.setStatus(BikeStatus.FREE);
+                bikeRepository.saveAndFlush(bike);
             }
         };
-        executorService.schedule(task, minutes, TimeUnit.SECONDS);
+        executorService.schedule(task, minutes, TimeUnit.MINUTES);
     }
 }
