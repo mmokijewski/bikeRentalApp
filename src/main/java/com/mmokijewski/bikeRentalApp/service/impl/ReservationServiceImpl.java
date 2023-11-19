@@ -72,23 +72,18 @@ public class ReservationServiceImpl implements ReservationService {
                 cyclistRepository.findById(cyclistId).orElseThrow(() -> new NoSuchCyclistException(cyclistId));
         if (checkIfBikeAvailable(bike)) {
             final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-            final Reservation newReservation = new Reservation(bike, cyclist, now,
-                    now.plus(minutes, ChronoUnit.MINUTES));
-            return reservationMapper.mapToDto(newReservation);
+            final Reservation newReservation =
+                    new Reservation(bike, cyclist, now, now.plus(minutes, ChronoUnit.MINUTES));
+            final Reservation saveResult = reservationRepository.saveAndFlush(newReservation);
+            return reservationMapper.mapToDto(saveResult);
         } else {
             throw new BikeNotAvailableException(bike.getId());
         }
     }
 
     private boolean checkIfBikeAvailable(final Bike bike) {
-        boolean available = true;
-        for (final Reservation reservation : reservationRepository.findAll()) {
-            if (reservation.getBike().getId().equals(bike.getId()) && reservation.getEndDate()
-                    .isAfter(LocalDateTime.now())) {
-                available = false;
-                break;
-            }
-        }
-        return available;
+        final Reservation lastReservation = reservationRepository.findLastReservationByBikeId(bike.getId());
+        LOGGER.info(lastReservation.getId());
+        return lastReservation.getEndDate().isBefore(LocalDateTime.now());
     }
 }
