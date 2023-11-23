@@ -84,6 +84,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservation.setUpdateDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         final Reservation saveResult = reservationRepository.saveAndFlush(reservation);
+        releaseBike(reservation.getBike().getId());
         return reservationMapper.mapToDto(saveResult);
     }
 
@@ -114,11 +115,15 @@ public class ReservationServiceImpl implements ReservationService {
                 reservation.setStatus(ReservationStatus.FINISHED);
                 reservation.setUpdateDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
                 reservationRepository.saveAndFlush(reservation);
-                final Bike bike = bikeRepository.findById(reservation.getBike().getId()).get();
-                bike.setStatus(BikeStatus.FREE);
-                bikeRepository.saveAndFlush(bike);
+                releaseBike(reservation.getBike().getId());
             }
         };
         executorService.schedule(task, minutes, TimeUnit.MINUTES);
+    }
+
+    private void releaseBike(final Long bikeId) {
+        final Bike bike = bikeRepository.findById(bikeId).get();
+        bike.setStatus(BikeStatus.FREE);
+        bikeRepository.saveAndFlush(bike);
     }
 }
