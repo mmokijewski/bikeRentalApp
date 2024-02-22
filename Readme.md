@@ -83,4 +83,4 @@ in [data.sql](src/main/resources/data.sql) file, so you can see some records jus
 initialization. After starting the application you can log into the database on http://localhost:8081/h2-console using
 parameters like on the picture below (yes, there is no password).
 
-![h2-login-page](./images/h2-login-page.png)
+![h2-login-page](images/h2-login-page.png)
