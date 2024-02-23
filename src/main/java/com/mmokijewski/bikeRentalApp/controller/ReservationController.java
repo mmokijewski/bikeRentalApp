@@ -35,6 +35,22 @@ public class ReservationController {
         return reservationDto != null ? ResponseEntity.ok(reservationDto) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/last")
+    public ResponseEntity<ReservationDto> lastReservation() {
+        final ReservationDto reservationDto = reservationService.findLastReservation();
+        return reservationDto != null ? ResponseEntity.ok(reservationDto) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/lastByBike/{bikeId}")
+    public ResponseEntity lastReservationByBikeID(@PathVariable final Long bikeId) {
+        try {
+            final ReservationDto reservationDto = reservationService.findLastReservationByBikeId(bikeId);
+            return reservationDto != null ? ResponseEntity.ok(reservationDto) : ResponseEntity.notFound().build();
+        } catch (final Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).contentType(MediaType.TEXT_PLAIN).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/new/{bikeId}/{cyclistId}")
     public ResponseEntity newReservation(@PathVariable final Long bikeId, @PathVariable final Long cyclistId) {
         try {

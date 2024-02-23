@@ -42,6 +42,10 @@ you can perform on your own in the terminal using cURL.
   e.g. `curl localhost:8081/reservations`
 - `/reservations/{id}` - returns reservation with given id \
   e.g. `curl localhost:8081/reservations/1`
+- `/reservations/last` - returns last reservation based on end time \
+  e.g. `curl localhost:8081/reservations/last`
+- `/reservations/lastByBike/{bikeId}` - returns last reservation for given bike based on end time \
+  e.g. `curl localhost:8081/reservations/last/2`
 - `/reservations/new/{bikeId}/{cyclistId}` - creates new reservation for given cyclist and bike id for default time and
   returns newly created reservation if input data was positively validated \
   e.g. `curl localhost:8081/reservations/new/1/1`

@@ -14,6 +14,10 @@ public interface ReservationService {
 
     ReservationDto findById(final Long id);
 
+    ReservationDto findLastReservation();
+
+    ReservationDto findLastReservationByBikeId(final Long bikeId) throws NoSuchBikeException;
+
     ReservationDto createReservation(final Long bikeId, final Long cyclistId)
             throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException;
 

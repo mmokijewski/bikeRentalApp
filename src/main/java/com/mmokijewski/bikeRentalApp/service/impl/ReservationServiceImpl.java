@@ -64,6 +64,19 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public ReservationDto findLastReservation() {
+        final Optional<Reservation> lastReservation = this.reservationRepository.findLastReservation();
+        return lastReservation.map(this.reservationMapper::mapToDto).orElse(null);
+    }
+
+    @Override
+    public ReservationDto findLastReservationByBikeId(Long bikeId) throws NoSuchBikeException {
+        final Bike bike = bikeRepository.findById(bikeId).orElseThrow(() -> new NoSuchBikeException(bikeId));
+        final Optional<Reservation> lastReservation = this.reservationRepository.findLastReservationByBikeId(bike.getId());
+        return lastReservation.map(this.reservationMapper::mapToDto).orElse(null);
+    }
+
+    @Override
     public ReservationDto createReservation(final Long bikeId, final Long cyclistId)
             throws BikeNotAvailableException, NoSuchBikeException, NoSuchCyclistException {
         return createReservation(bikeId, cyclistId, DEFAULT_RESERVATION_TIME_IN_MINUTES);
